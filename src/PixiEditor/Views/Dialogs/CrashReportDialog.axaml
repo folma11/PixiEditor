@@ -6,10 +6,11 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:dialogs="clr-namespace:PixiEditor.Views.Dialogs"
         xmlns:ui="clr-namespace:PixiEditor.Extensions.UI;assembly=PixiEditor.Extensions"
+        xmlns:localization="clr-namespace:PixiEditor.UI.Common.Localization;assembly=PixiEditor.UI.Common"
         xmlns:viewModels="clr-namespace:PixiEditor.ViewModels"
         mc:Ignorable="d"
         ExtendClientAreaToDecorationsHint="False"
-        Title="PixiEditor has crashed!"
+        localization:Translator.Key="CRASH_REPORT_TITLE"
         MinWidth="480" MinHeight="195"
         x:DataType="viewModels:CrashReportViewModel"
         Width="480" Height="195">
@@ -20,25 +21,19 @@
         <StackPanel>
             <Grid Background="{DynamicResource ThemeBackgroundBrush}">
                 <StackPanel Margin="7" VerticalAlignment="Center">
-                    <TextBlock Text="{Binding DocumentCount, StringFormat={}{0} file(s) might be recoverable}"
+                    <TextBlock localization:Translator.LocalizedString="{Binding RecoverableDocumentsText}"
                                d:Text="2 file(s) can be recovered" />
-                    <TextBlock TextWrapping="Wrap">You can help the developers fix this bug by sending a crash report that was generated (you will still be able to recover the files).</TextBlock>
+                    <TextBlock TextWrapping="Wrap" localization:Translator.Key="CRASH_REPORT_HELP" />
                 </StackPanel>
             </Grid>
 
             <WrapPanel Margin="0,20,0,5" Orientation="Horizontal" HorizontalAlignment="Center">
                 <Button Command="{Binding OpenSendCrashReportCommand}"
-                        Width="120">
-                    Send report
-                </Button>
+                        Width="120" localization:Translator.Key="SEND" />
                 <Button Margin="5,0,5,0" Width="120"
-                        Command="{Binding RecoverDocumentsCommand}">
-                    Recover files
-                </Button>
+                        Command="{Binding RecoverDocumentsCommand}" localization:Translator.Key="RECOVER_FILES" />
                 <Button Width="120"
-                        Command="{Binding RunInSafeModeCommand}">
-                    Safe mode
-                </Button>
+                        Command="{Binding RunInSafeModeCommand}" localization:Translator.Key="SAFE_MODE" />
             </WrapPanel>
         </StackPanel>
     </Grid>

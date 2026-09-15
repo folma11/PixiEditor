@@ -1,7 +1,8 @@
 ﻿<ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:dialogs="using:Avalonia.Dialogs"
-                    xmlns:internal="using:Avalonia.Dialogs.Internal">
+                    xmlns:internal="using:Avalonia.Dialogs.Internal"
+                    xmlns:localization="clr-namespace:PixiEditor.UI.Common.Localization;assembly=PixiEditor.UI.Common">
   <DrawingGroup x:Key="LevelUp">
     <GeometryDrawing Brush="#00FFFFFF" Geometry="F1M16,16L0,16 0,0 16,0z" />
     <GeometryDrawing Brush="#FFF6F6F6"
@@ -82,7 +83,7 @@
             <StackPanel DockPanel.Dock="Left"
                         Orientation="Horizontal">
               <CheckBox IsChecked="{Binding ShowHiddenFiles}">
-                <TextBlock>Show hidden files</TextBlock>
+                <TextBlock localization:Translator.Key="SHOW_HIDDEN_FILES" />
               </CheckBox>
             </StackPanel>
             <StackPanel HorizontalAlignment="Right"
@@ -93,8 +94,8 @@
                   <Setter Property="Margin" Value="4" />
                 </Style>
               </StackPanel.Styles>
-              <Button Command="{Binding Ok}" MinWidth="60">OK</Button>
-              <Button Command="{Binding Cancel}" MinWidth="60">Cancel</Button>
+              <Button Command="{Binding Ok}" MinWidth="60" localization:Translator.Key="OK" />
+              <Button Command="{Binding Cancel}" MinWidth="60" localization:Translator.Key="CANCEL" />
             </StackPanel>
           </DockPanel>
 
@@ -107,7 +108,7 @@
           <TextBox DockPanel.Dock="Bottom"
                    IsVisible="{Binding !SelectingFolder}"
                    Text="{Binding FileName}"
-                   Watermark="File name" />
+                   Watermark="{localization:Translate Key=FILE_NAME}" />
 
           <ListBox x:Name="PART_QuickLinks"
                    Margin="0,0,5,5"
@@ -146,13 +147,13 @@
                 <ColumnDefinition Width="16" SharedSizeGroup="Splitter" />
               </Grid.ColumnDefinitions>
               <TextBlock Grid.Column="1"
-                         Text="Name" />
+                         localization:Translator.Key="NAME" />
               <GridSplitter Grid.Column="2"
                             ResizeDirection="Columns"
                             Background="Transparent" />
               <Rectangle HorizontalAlignment="Left" Grid.Column="2" VerticalAlignment="Stretch" Width="1" Fill="{DynamicResource ThemeControlMidBrush}"/>
               <TextBlock Grid.Column="3"
-                         Text="Date Modified" />
+                         localization:Translator.Key="DATE_MODIFIED" />
               <GridSplitter Grid.Column="4"
                             ResizeDirection="Columns"
                             Background="Transparent" />
@@ -163,7 +164,7 @@
                          Fill="{DynamicResource ThemeControlMidBrush}"/>
 
               <TextBlock Grid.Column="5"
-                         Text="Type" />
+                         localization:Translator.Key="TYPE" />
               <GridSplitter Grid.Column="6" ResizeDirection="Columns"
                             Background="Transparent" />
               <Rectangle HorizontalAlignment="Left"
@@ -173,7 +174,7 @@
                          Fill="{DynamicResource ThemeControlMidBrush}"/>
 
               <TextBlock Grid.Column="7"
-                         Text="Size" />
+                         localization:Translator.Key="SIZE" />
               <GridSplitter Grid.Column="8"
                             ResizeDirection="Columns"
                             Background="Transparent" />

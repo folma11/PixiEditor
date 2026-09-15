@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using LiveMarkdown.Avalonia;
 using PixiEditor.Extensions.Runtime;
 using PixiEditor.Platform;
+using PixiEditor.UI.Common.Localization;
 
 namespace PixiEditor.ViewModels.ExtensionManager;
 
@@ -228,7 +229,7 @@ internal class AvailableContentViewModel : ObservableObject
             }
             catch (Exception)
             {
-                Dispatcher.UIThread.Post(() => MarkdownBody.Append("Failed to load content."));
+                Dispatcher.UIThread.Post(() => MarkdownBody.Append(new LocalizedString("FAILED_TO_LOAD_CONTENT").Value));
             }
         });
     }

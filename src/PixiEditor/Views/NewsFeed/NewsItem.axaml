@@ -5,6 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:ui="clr-namespace:PixiEditor.Helpers.UI"
+             xmlns:localization="clr-namespace:PixiEditor.UI.Common.Localization;assembly=PixiEditor.UI.Common"
              xmlns:asyncImageLoader="clr-namespace:AsyncImageLoader;assembly=AsyncImageLoader.Avalonia"
              xmlns:converters="clr-namespace:PixiEditor.Helpers.Converters"
              xmlns:ui1="clr-namespace:PixiEditor.Extensions.UI;assembly=PixiEditor.Extensions"
@@ -38,7 +39,8 @@
                 <Border IsVisible="{Binding ElementName=newsItem, Path=News.IsNew}"
                         Margin="2.5 2.5" Background="{DynamicResource ThemeAccentBrush}" HorizontalAlignment="Left"
                         Padding="5 2.5" CornerRadius="5">
-                    <TextBlock Text="New!" Foreground="White" FontSize="12" FontStyle="Italic" />
+                    <TextBlock localization:Translator.Key="NEW_BADGE"
+                               Foreground="White" FontSize="12" FontStyle="Italic" />
                 </Border>
                 <TextBlock Margin="8 5" HorizontalAlignment="Right" FontSize="12" Foreground="LightGray"
                            Text="{Binding ElementName=newsItem, Path=News.Date, StringFormat=d}" />

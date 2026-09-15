@@ -7,7 +7,8 @@
 
 <ResourceDictionary xmlns="https://github.com/avaloniaui"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:sys="using:System">
+                    xmlns:sys="using:System"
+                    xmlns:localization="clr-namespace:PixiEditor.UI.Common.Localization;assembly=PixiEditor.UI.Common">
   <Design.PreviewWith>
     <Border Height="500"
             Padding="20">
@@ -112,13 +113,13 @@
                            FontFamily="{TemplateBinding FontFamily}"
                            FontSize="{TemplateBinding FontSize}"
                            FontWeight="{TemplateBinding FontWeight}"
-                           Text="day" />
+                           localization:Translator.Key="DAY" />
                 <TextBlock Name="PART_MonthTextBlock"
                            Padding="{DynamicResource DatePickerHostMonthPadding}"
                            FontFamily="{TemplateBinding FontFamily}"
                            FontSize="{TemplateBinding FontSize}"
                            FontWeight="{TemplateBinding FontWeight}"
-                           Text="month"
+                           localization:Translator.Key="MONTH"
                            TextAlignment="Left" />
                 <TextBlock Name="PART_YearTextBlock"
                            Padding="{DynamicResource DatePickerHostPadding}"
@@ -126,7 +127,7 @@
                            FontFamily="{TemplateBinding FontFamily}"
                            FontSize="{TemplateBinding FontSize}"
                            FontWeight="{TemplateBinding FontWeight}"
-                           Text="year" />
+                           localization:Translator.Key="YEAR" />
                 <Rectangle x:Name="PART_FirstSpacer"
                            Grid.Column="1"
                            Width="1"

@@ -114,6 +114,13 @@
       "localeFileName": "sl.json",
       "iconFileName": "sl.png",
       "lastUpdated": "2026-07-15 20:54:01"
+    },
+    {
+      "name": "日本語",
+      "code": "ja",
+      "localeFileName": "ja.json",
+      "iconFileName": "ja.png",
+      "lastUpdated": "2026-09-16 00:00:00"
     }
   ]
 }

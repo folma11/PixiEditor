@@ -4,6 +4,7 @@ using PixiEditor.Initialization;
 using PixiEditor.Models.Commands.Attributes.Commands;
 using PixiEditor.Models.Dialogs;
 using PixiEditor.OperatingSystem;
+using PixiEditor.UI.Common.Localization;
 
 namespace PixiEditor.ViewModels.SubViewModels;
 
@@ -46,7 +47,9 @@ internal class MiscViewModel : SubViewModel<ViewModelMain>
         catch (Exception e)
         {
             CrashHelper.SendExceptionInfo(e);
-            NoticeDialog.Show(title: "Error", message: $"Couldn't open the address {uri} in your default browser");
+            NoticeDialog.Show(
+                title: new LocalizedString("ERROR").Value,
+                message: new LocalizedString("ERROR_OPENING_ADDRESS", uri).Value);
         }
     }
 

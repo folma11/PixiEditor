@@ -4,6 +4,7 @@ using Avalonia.Platform;
 using PixiEditor.AnimationRenderer.FFmpeg;
 using PixiEditor.Models.IO;
 using PixiEditor.UI.Common.Fonts;
+using PixiEditor.UI.Common.Localization;
 
 namespace PixiEditor.Views.Visuals;
 
@@ -371,7 +372,7 @@ public class VideoView : Control
         base.Render(context);
         if (failedStartFfmpeg)
         {
-            context.DrawText(new FormattedText("Failed rendering the video", CultureInfo.InvariantCulture,
+            context.DrawText(new FormattedText(new LocalizedString("FAILED_RENDERING_VIDEO").Value, CultureInfo.InvariantCulture,
                     FlowDirection.LeftToRight, Typeface.Default, 16, Brushes.White),
                 new Point(Bounds.Width / 2 - 12 - 80, Bounds.Height / 2 - 12));
             return;

@@ -1,11 +1,12 @@
 ﻿<ResourceDictionary xmlns="https://github.com/avaloniaui"
-                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:localization="clr-namespace:PixiEditor.UI.Common.Localization;assembly=PixiEditor.UI.Common">
     <Design.PreviewWith>
         <SelectableTextBlock Text="Preview" />
     </Design.PreviewWith>
 
     <MenuFlyout x:Key="SelectableTextBlockContextFlyout" Placement="Bottom">
-        <MenuItem x:Name="SelectableTextBlockContextFlyoutCopyItem" Header="Copy" Command="{Binding $parent[SelectableTextBlock].Copy}"
+        <MenuItem x:Name="SelectableTextBlockContextFlyoutCopyItem" localization:Translator.Key="COPY" Command="{Binding $parent[SelectableTextBlock].Copy}"
                   IsEnabled="{Binding $parent[SelectableTextBlock].CanCopy}" InputGesture="{x:Static TextBox.CopyGesture}" />
     </MenuFlyout>
 

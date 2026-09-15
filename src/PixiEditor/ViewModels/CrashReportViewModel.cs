@@ -22,6 +22,8 @@ internal partial class CrashReportViewModel : Window
 
     public int DocumentCount { get; }
 
+    public LocalizedString RecoverableDocumentsText => new("CRASH_RECOVERABLE_FILES", DocumentCount);
+
     public bool IsDebugBuild { get; set; }
 
     public RelayCommand OpenSendCrashReportCommand { get; }
