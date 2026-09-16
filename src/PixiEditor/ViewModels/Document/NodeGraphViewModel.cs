@@ -323,6 +323,11 @@ internal class NodeGraphViewModel : ViewModelBase, INodeGraphHandler, IDisposabl
 
             foreach (var input in node.Inputs)
             {
+                if (!input.IsRenderDependency)
+                {
+                    continue;
+                }
+
                 if (input.ConnectedOutput == null)
                 {
                     continue;

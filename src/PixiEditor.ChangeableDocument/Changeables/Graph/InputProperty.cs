@@ -142,6 +142,12 @@ public class InputProperty : IInputProperty
     public Node Node { get; }
     public Type ValueType { get; }
 
+    /// <summary>
+    /// Configuration-only inputs can still expose normal node sockets and
+    /// persist connections, while being excluded from render graph traversal.
+    /// </summary>
+    public virtual bool IsRenderDependency => true;
+
     internal virtual bool CacheChanged
     {
         get

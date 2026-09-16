@@ -33,6 +33,11 @@ public static class GraphUtils
                     continue;
                 }
 
+                if (!input.IsRenderDependency)
+                {
+                    continue;
+                }
+
                 if (finalQueue.Contains(input.Connection.Node))
                 {
                     continue;
@@ -94,14 +99,20 @@ public static class GraphUtils
         return hash.ToHashCode();
     }
 
-     public static bool IsLoop(IInputProperty input, OutputProperty output)
+    public static bool IsLoop(IInputProperty input, OutputProperty output)
     {
+        if (!input.IsRenderDependency)
+        {
+            return false;
+        }
+
         if (input.Node == output.Node)
         {
             return true;
         }
 
-        if (input.Node.OutputProperties.Any(x => x.Connections.Any(y => y.Node == output.Node)))
+        if (input.Node.OutputProperties.Any(x => x.Connections.Any(y =>
+                y.IsRenderDependency && y.Node == output.Node)))
         {
             return true;
         }

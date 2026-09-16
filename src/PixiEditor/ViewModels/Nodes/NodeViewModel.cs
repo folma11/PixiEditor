@@ -254,6 +254,11 @@ internal abstract class NodeViewModel : ObservableObject, INodeHandler
 
             foreach (var inputProperty in node.Inputs)
             {
+                if (!inputProperty.IsRenderDependency)
+                {
+                    continue;
+                }
+
                 if (inputProperty.ConnectedOutput != null)
                 {
                     queueNodes.Enqueue(inputProperty.ConnectedOutput.Node);
@@ -293,6 +298,11 @@ internal abstract class NodeViewModel : ObservableObject, INodeHandler
 
             foreach (var inputProperty in node.Item1.Inputs)
             {
+                if (!inputProperty.IsRenderDependency)
+                {
+                    continue;
+                }
+
                 if (inputProperty.ConnectedOutput != null)
                 {
                     queueNodes.Enqueue((inputProperty.ConnectedOutput.Node, node.Item1));
@@ -331,6 +341,11 @@ internal abstract class NodeViewModel : ObservableObject, INodeHandler
 
             foreach (var inputProperty in node.Item1.Inputs)
             {
+                if (!inputProperty.IsRenderDependency)
+                {
+                    continue;
+                }
+
                 if (inputProperty.ConnectedOutput != null)
                 {
                     queueNodes.Enqueue((inputProperty.ConnectedOutput.Node, node.Item1, inputProperty));
@@ -372,6 +387,11 @@ internal abstract class NodeViewModel : ObservableObject, INodeHandler
             {
                 foreach (var connection in outputProperty.ConnectedInputs)
                 {
+                    if (!connection.IsRenderDependency)
+                    {
+                        continue;
+                    }
+
                     queueNodes.Enqueue(connection.Node);
                 }
             }
@@ -411,6 +431,11 @@ internal abstract class NodeViewModel : ObservableObject, INodeHandler
             {
                 foreach (var connection in outputProperty.ConnectedInputs)
                 {
+                    if (!connection.IsRenderDependency)
+                    {
+                        continue;
+                    }
+
                     queueNodes.Enqueue((connection.Node, node.Item1));
                 }
             }
@@ -450,6 +475,11 @@ internal abstract class NodeViewModel : ObservableObject, INodeHandler
             {
                 foreach (var connection in outputProperty.ConnectedInputs)
                 {
+                    if (!connection.IsRenderDependency)
+                    {
+                        continue;
+                    }
+
                     queueNodes.Enqueue((connection.Node, node.Item1, outputProperty));
                 }
             }
@@ -490,6 +520,11 @@ internal abstract class NodeViewModel : ObservableObject, INodeHandler
             {
                 foreach (var connection in outputProperty.ConnectedInputs)
                 {
+                    if (!connection.IsRenderDependency)
+                    {
+                        continue;
+                    }
+
                     queueNodes.Enqueue((connection.Node, node.Item1, outputProperty, connection));
                 }
             }

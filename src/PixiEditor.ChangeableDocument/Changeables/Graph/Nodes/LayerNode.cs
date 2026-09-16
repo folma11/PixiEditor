@@ -13,11 +13,43 @@ namespace PixiEditor.ChangeableDocument.Changeables.Graph.Nodes;
 
 public abstract class LayerNode : StructureNode, IReadOnlyLayerNode, IClipSource
 {
+    public const string LocalBackPropertyName = "LocalBack";
+    public const string LocalOcclusionEnabledPropertyName = "LocalOcclusionEnabled";
+
     protected Dictionary<(ChunkResolution, int), Texture> workingSurfaces =
         new Dictionary<(ChunkResolution, int), Texture>();
 
+    /// <summary>
+    /// Optional configuration socket for one local relation owned by this
+    /// layer. The layer itself is the front layer and the connected layer is
+    /// the local back layer. This connection is deliberately not a render
+    /// dependency, because local relations may form cycles by design.
+    /// </summary>
+    public RenderInputProperty LocalBack { get; }
+    public InputProperty<bool> LocalOcclusionEnabled { get; }
+
+    public bool HasLocalOcclusionConfiguration => LocalBack.Connection is not null;
+
     public LayerNode()
     {
+        LocalBack = CreateRenderInput(LocalBackPropertyName, "LOCAL_BACK_OF_LAYER", false);
+        LocalOcclusionEnabled = CreateInput(LocalOcclusionEnabledPropertyName,
+            "LOCAL_OCCLUSION_ENABLED", true);
+    }
+
+    public bool TryGetLocalOcclusionRelation(out OcclusionRelation relation)
+    {
+        relation = default;
+
+        if (!LocalOcclusionEnabled.Value ||
+            LocalBack.Connection?.Node is not IReadOnlyLayerNode backLayer ||
+            Id == backLayer.Id)
+        {
+            return false;
+        }
+
+        relation = new OcclusionRelation(Id, backLayer.Id);
+        return true;
     }
 
     public override void Render(SceneObjectRenderContext sceneContext)

@@ -23,6 +23,12 @@ public interface IInputProperty : INodeProperty
     public IOutputProperty? Connection { get; set; }
     public object NonOverridenValue { get; set;  }
     public bool CanConnect(IOutputProperty internalOutputProperty);
+
+    /// <summary>
+    /// Gets whether a connection to this input participates in normal render
+    /// graph traversal and execution ordering.
+    /// </summary>
+    public bool IsRenderDependency { get; }
 }
 
 public interface IOutputProperty : INodeProperty

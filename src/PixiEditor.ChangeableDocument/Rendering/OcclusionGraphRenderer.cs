@@ -2,6 +2,7 @@ using System.Runtime.InteropServices;
 using PixiEditor.ChangeableDocument.Changeables;
 using PixiEditor.ChangeableDocument.Changeables.Animations;
 using PixiEditor.ChangeableDocument.Changeables.Graph.Interfaces;
+using PixiEditor.ChangeableDocument.Changeables.Graph.Nodes;
 using PixiEditor.ChangeableDocument.Changeables.Interfaces;
 using Drawie.Backend.Core;
 using Drawie.Backend.Core.Numerics;
@@ -15,18 +16,16 @@ namespace PixiEditor.ChangeableDocument.Rendering;
 /// Applies local occlusion relations to an already rendered document image.
 /// The normal node graph remains the source of truth; this compositor only
 /// swaps the two isolated layer contributions where a relation contradicts the
-/// stack order. Relations are considered in graph-list order; a relation that
-/// would close a visible cycle is discarded entirely.
+/// stack order. Standard relation declarations (standalone
+/// OcclusionRelationNodes or layer-owned local relations) are ordered by
+/// their X position, from left to right. The legacy OcclusionGraph is
+/// retained as a fallback and keeps its insertion order.
 /// </summary>
 public static class OcclusionGraphRenderer
 {
     public static void Apply(Texture output, IReadOnlyDocument document, Matrix3X3 renderMatrix, VecI renderSize,
         KeyFrameTime frameTime, RenderContext baseContext)
     {
-        OcclusionGraph occlusionGraph = document.OcclusionGraph;
-        if (!occlusionGraph.IsEnabled || occlusionGraph.Relations.Count == 0)
-            return;
-
         IReadOnlyStructureNode[] orderedMembers = document.GetStructureTreeInOrder();
         Dictionary<Guid, (IReadOnlyLayerNode Layer, int Order)> layers = orderedMembers
             .Select((member, index) => (member, index))
@@ -34,10 +33,10 @@ public static class OcclusionGraphRenderer
             .ToDictionary(x => x.member.Id,
                 x => ((IReadOnlyLayerNode)x.member, x.index));
 
-        OcclusionRelation[] relations = occlusionGraph.Relations
+        List<OcclusionRelation> relations = GetRelations(document)
             .Where(x => layers.ContainsKey(x.FrontLayerId) && layers.ContainsKey(x.BackLayerId))
-            .ToArray();
-        if (relations.Length == 0)
+            .ToList();
+        if (relations.Count == 0)
             return;
 
         Dictionary<Guid, Texture> isolatedLayers = new();
@@ -50,10 +49,10 @@ public static class OcclusionGraphRenderer
         {
             output.DrawingSurface.Canvas.SetMatrix(Matrix3X3.Identity);
 
-            HashSet<OcclusionRelation> ignoredRelations;
+            HashSet<int> ignoredRelationIndexes;
             try
             {
-                ignoredRelations = FindIgnoredRelations(relations, layers, frameTime, document,
+                ignoredRelationIndexes = FindIgnoredRelations(relations, layers, frameTime, document,
                     isolatedLayers, renderMatrix, renderSize, baseContext);
             }
             catch (Exception)
@@ -64,11 +63,12 @@ public static class OcclusionGraphRenderer
                 return;
             }
 
-            foreach (OcclusionRelation relation in relations)
+            for (int relationIndex = 0; relationIndex < relations.Count; relationIndex++)
             {
+                OcclusionRelation relation = relations[relationIndex];
                 // Once a relation creates a same-point conflict, the relation
                 // itself is discarded. It must not affect any other overlap.
-                if (ignoredRelations.Contains(relation))
+                if (ignoredRelationIndexes.Contains(relationIndex))
                     continue;
 
                 // The structure traversal is bottom-to-top. A relation that
@@ -130,6 +130,60 @@ public static class OcclusionGraphRenderer
                 texture.Dispose();
         }
     }
+
+    private static List<OcclusionRelation> GetRelations(IReadOnlyDocument document)
+    {
+        LayerNode[] localRelationLayers = document.NodeGraph.AllNodes
+            .OfType<LayerNode>()
+            .Where(x => x.HasLocalOcclusionConfiguration)
+            .ToArray();
+
+        List<OcclusionRelationNode> relationNodes = document.NodeGraph.AllNodes
+            .OfType<OcclusionRelationNode>()
+            .ToList();
+
+        // A configured layer or a standard relation node switches the
+        // document to node-based configuration. Unconnected/disabled entries
+        // therefore intentionally mean "no local correction", rather than
+        // falling back to a second, independent configuration store.
+        if (relationNodes.Count > 0 || localRelationLayers.Length > 0)
+        {
+            List<(OcclusionRelation Relation, VecD Position, Guid OwnerId)> candidates =
+                localRelationLayers
+                    .Select(x =>
+                    {
+                        bool isValid = x.TryGetLocalOcclusionRelation(out OcclusionRelation relation);
+                        return (Relation: relation, IsValid: isValid, Position: x.Position, OwnerId: x.Id);
+                    })
+                    .Where(x => x.IsValid)
+                    .Select(x => (x.Relation, x.Position, x.OwnerId))
+                    .ToList();
+
+            candidates.AddRange(relationNodes
+                .Select(x =>
+                {
+                    bool isValid = x.TryGetRelation(out OcclusionRelation relation);
+                    return (Relation: relation, IsValid: isValid, Position: x.Position, OwnerId: x.Id);
+                })
+                .Where(x => x.IsValid)
+                .Select(x => (x.Relation, x.Position, x.OwnerId)));
+
+            return candidates
+                .OrderBy(x => NormalizePriority(x.Position.X))
+                .ThenBy(x => NormalizePriority(x.Position.Y))
+                .ThenBy(x => x.OwnerId)
+                .Select(x => x.Relation)
+                .ToList();
+        }
+
+        OcclusionGraph occlusionGraph = document.OcclusionGraph;
+        return occlusionGraph.IsEnabled
+            ? occlusionGraph.Relations.ToList()
+            : new List<OcclusionRelation>();
+    }
+
+    private static double NormalizePriority(double value) =>
+        double.IsFinite(value) ? value : double.MaxValue;
 
     private static void ApplyLocalRelationSwap(Span<Half> outputPixels, Texture front, Texture back,
         RectI overlapBounds)
@@ -212,7 +266,7 @@ public static class OcclusionGraphRenderer
         }
     }
 
-    private static HashSet<OcclusionRelation> FindIgnoredRelations(
+    private static HashSet<int> FindIgnoredRelations(
         IReadOnlyList<OcclusionRelation> relations,
         IReadOnlyDictionary<Guid, (IReadOnlyLayerNode Layer, int Order)> layers,
         KeyFrameTime frameTime,
@@ -222,12 +276,20 @@ public static class OcclusionGraphRenderer
         VecI renderSize,
         RenderContext baseContext)
     {
-        HashSet<OcclusionRelation> ignoredRelations = new();
+        HashSet<int> ignoredRelationIndexes = new();
         List<OcclusionRelation> acceptedRelations = new();
 
         for (int relationIndex = 0; relationIndex < relations.Count; relationIndex++)
         {
             OcclusionRelation relation = relations[relationIndex];
+            if (acceptedRelations.Contains(relation))
+            {
+                // A duplicate relation would apply the same pixel delta twice.
+                // Keep the leftmost instance and ignore the later one.
+                ignoredRelationIndexes.Add(relationIndex);
+                continue;
+            }
+
             if (!TryFindRelationPath(relation.BackLayerId, relation.FrontLayerId, acceptedRelations, relation,
                     new HashSet<Guid> { relation.BackLayerId }, out List<OcclusionRelation> path) ||
                 path.Count < 1)
@@ -252,10 +314,10 @@ public static class OcclusionGraphRenderer
 
             // The already accepted path is kept. This newly processed relation
             // is the one that causes the conflict and is discarded entirely.
-            ignoredRelations.Add(relation);
+            ignoredRelationIndexes.Add(relationIndex);
         }
 
-        return ignoredRelations;
+        return ignoredRelationIndexes;
     }
 
     private static bool TryFindRelationPath(Guid current, Guid target,

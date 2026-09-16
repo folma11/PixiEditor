@@ -24,6 +24,7 @@ internal abstract class NodePropertyViewModel : ViewModelBase, INodePropertyHand
     private string errors = string.Empty;
     private bool mergeChanges = false;
     private bool socketEnabledEnabled = true;
+    private bool isRenderDependency = true;
 
     private object computedValue;
 
@@ -171,6 +172,12 @@ internal abstract class NodePropertyViewModel : ViewModelBase, INodePropertyHand
     }
 
     public Type PropertyType { get; }
+
+    public bool IsRenderDependency
+    {
+        get => isRenderDependency;
+        set => SetProperty(ref isRenderDependency, value);
+    }
 
     public bool SocketEnabled
     {

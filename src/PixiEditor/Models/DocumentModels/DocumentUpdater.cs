@@ -783,6 +783,7 @@ private List<INodePropertyHandler> CreateProperties(ImmutableArray<NodePropertyI
             prop.IsFunc = propInfo.ValueType.IsAssignableTo(typeof(Delegate));
             prop.IsArray = propInfo.ValueType.IsArray;
             prop.IsNestedArray = propInfo.ValueType.IsArray && propInfo.ValueType.GetElementType()?.IsArray == true;
+            prop.IsRenderDependency = propInfo.IsRenderDependency;
             prop.InternalSetValue(prop.IsFunc
                 ? (propInfo.InputValue as ShaderExpressionVariable)?.GetConstant()
                 : propInfo.InputValue);

@@ -24,7 +24,8 @@ public record CreateNode_ChangeInfo(
         return properties.Select(p => new NodePropertyInfo(p.InternalPropertyName, p.DisplayName, p.ValueType, isInput,
                 GetNonOverridenValue(p),
                 node,
-                GetConnectedProperties(p)))
+                GetConnectedProperties(p),
+                p is not IInputProperty inputProperty || inputProperty.IsRenderDependency))
             .ToImmutableArray();
     }
 

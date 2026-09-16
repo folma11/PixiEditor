@@ -4,8 +4,11 @@ namespace PixiEditor.ChangeableDocument.Changeables.Graph;
 
 public class RenderInputProperty : InputProperty<Painter?>
 {
-    internal RenderInputProperty(Node node, string internalName, string displayName, Painter? defaultValue) : base(node, internalName, displayName, defaultValue)
+    public override bool IsRenderDependency { get; }
+
+    internal RenderInputProperty(Node node, string internalName, string displayName, Painter? defaultValue,
+        bool isRenderDependency = true) : base(node, internalName, displayName, defaultValue)
     {
-        
+        IsRenderDependency = isRenderDependency;
     }
 }

@@ -155,6 +155,11 @@ public abstract class Node : IReadOnlyNode, IDisposable
 
             foreach (var inputProperty in node.Item1.InputProperties)
             {
+                if (!inputProperty.IsRenderDependency)
+                {
+                    continue;
+                }
+
                 if (branchCondition != null && !branchCondition(inputProperty))
                 {
                     continue;
@@ -190,6 +195,11 @@ public abstract class Node : IReadOnlyNode, IDisposable
 
             foreach (var inputProperty in node.Item1.InputProperties)
             {
+                if (!inputProperty.IsRenderDependency)
+                {
+                    continue;
+                }
+
                 if (inputProperty.Connection != null)
                 {
                     queueNodes.Enqueue((inputProperty.Connection.Node, node.Item1, inputProperty));
@@ -220,6 +230,11 @@ public abstract class Node : IReadOnlyNode, IDisposable
 
             foreach (var inputProperty in node.InputProperties)
             {
+                if (!inputProperty.IsRenderDependency)
+                {
+                    continue;
+                }
+
                 if (inputProperty.Connection != null)
                 {
                     queueNodes.Enqueue(inputProperty.Connection.Node);
@@ -252,6 +267,11 @@ public abstract class Node : IReadOnlyNode, IDisposable
             {
                 foreach (var connection in outputProperty.Connections)
                 {
+                    if (!connection.IsRenderDependency)
+                    {
+                        continue;
+                    }
+
                     if (connection.Connection != null)
                     {
                         queueNodes.Enqueue(connection.Node);
@@ -285,6 +305,11 @@ public abstract class Node : IReadOnlyNode, IDisposable
             {
                 foreach (var connection in outputProperty.Connections)
                 {
+                    if (!connection.IsRenderDependency)
+                    {
+                        continue;
+                    }
+
                     if (connection.Connection != null)
                     {
                         queueNodes.Enqueue((connection.Node, connection));
@@ -318,6 +343,11 @@ public abstract class Node : IReadOnlyNode, IDisposable
             {
                 foreach (var connection in outputProperty.Connections)
                 {
+                    if (!connection.IsRenderDependency)
+                    {
+                        continue;
+                    }
+
                     if (connection.Connection != null)
                     {
                         queueNodes.Enqueue((connection.Node, connection, outputProperty));
@@ -425,9 +455,11 @@ public abstract class Node : IReadOnlyNode, IDisposable
         return prop;
     }
 
-    protected RenderInputProperty CreateRenderInput(string internalName, string displayName)
+    protected RenderInputProperty CreateRenderInput(string internalName, string displayName,
+        bool isRenderDependency = true)
     {
-        RenderInputProperty prop = new RenderInputProperty(this, internalName, displayName, null);
+        RenderInputProperty prop = new RenderInputProperty(this, internalName, displayName, null,
+            isRenderDependency);
         AddInputProperty(prop);
 
         return prop;

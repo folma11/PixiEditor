@@ -1,7 +1,10 @@
 ﻿using PixiEditor.ChangeableDocument.Actions.Generated;
+using System.Collections.Specialized;
+using System.ComponentModel;
 using PixiEditor.ChangeableDocument.Changeables.Graph.Nodes;
 using Drawie.Backend.Core.Numerics;
 using PixiEditor.Helpers;
+using PixiEditor.Models.Events;
 using PixiEditor.Models.Handlers;
 using PixiEditor.Models.Layers;
 using Drawie.Numerics;
@@ -12,6 +15,9 @@ namespace PixiEditor.ViewModels.Document.Nodes;
 #nullable enable
 internal abstract class StructureMemberViewModel<T> : NodeViewModel<T>, IStructureMemberHandler where T : Node
 {
+    private NodePropertyViewModel? localOcclusionBack;
+    private NodePropertyViewModel? localOcclusionEnabled;
+
     public StructureMemberViewModel()
     {
     }
@@ -33,6 +39,43 @@ internal abstract class StructureMemberViewModel<T> : NodeViewModel<T>, IStructu
                 activeNormalizedFrameProp.IsVisible = useCustomTimeProp.Value is true;
             };
         }
+
+        localOcclusionBack = FindInputProperty(LayerNode.LocalBackPropertyName);
+        localOcclusionEnabled = FindInputProperty(LayerNode.LocalOcclusionEnabledPropertyName);
+
+        if (localOcclusionBack is not null)
+        {
+            localOcclusionBack.ConnectedOutputChanged += LocalOcclusionInput_ConnectedOutputChanged;
+            if (localOcclusionEnabled is not null)
+                localOcclusionEnabled.ValueChanged += LocalOcclusionEnabled_ValueChanged;
+
+            PropertyChanged += LocalOcclusionNode_PropertyChanged;
+            Document.NodeGraph.AllNodes.CollectionChanged += LocalOcclusionNodes_CollectionChanged;
+            OcclusionRelationNodeViewModel.RefreshConflictIndicators(Document);
+        }
+    }
+
+    private void LocalOcclusionInput_ConnectedOutputChanged(object? sender, EventArgs e)
+    {
+        OcclusionRelationNodeViewModel.RefreshConflictIndicators(Document);
+    }
+
+    private void LocalOcclusionEnabled_ValueChanged(INodePropertyHandler property,
+        NodePropertyValueChangedArgs args)
+    {
+        OcclusionRelationNodeViewModel.RefreshConflictIndicators(Document);
+    }
+
+    private void LocalOcclusionNode_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+    {
+        if (e.PropertyName == nameof(PositionBindable))
+            OcclusionRelationNodeViewModel.RefreshConflictIndicators(Document);
+    }
+
+    private void LocalOcclusionNodes_CollectionChanged(object? sender,
+        NotifyCollectionChangedEventArgs e)
+    {
+        OcclusionRelationNodeViewModel.RefreshConflictIndicators(Document);
     }
 
     private bool isVisible;
@@ -202,6 +245,18 @@ internal abstract class StructureMemberViewModel<T> : NodeViewModel<T>, IStructu
 
     public override void Dispose()
     {
+        if (localOcclusionBack is not null)
+        {
+            localOcclusionBack.ConnectedOutputChanged -= LocalOcclusionInput_ConnectedOutputChanged;
+            if (localOcclusionEnabled is not null)
+                localOcclusionEnabled.ValueChanged -= LocalOcclusionEnabled_ValueChanged;
+
+            PropertyChanged -= LocalOcclusionNode_PropertyChanged;
+            Document.NodeGraph.AllNodes.CollectionChanged -= LocalOcclusionNodes_CollectionChanged;
+        }
+
+        localOcclusionBack = null;
+        localOcclusionEnabled = null;
         base.Dispose();
         Preview?.Preview?.Dispose();
         MaskPreview?.Preview?.Dispose();

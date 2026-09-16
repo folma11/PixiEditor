@@ -187,6 +187,31 @@ internal class AffectedAreasGatherer
                     }
 
                     break;
+                case CreateNode_ChangeInfo info when info.InternalName == OcclusionRelationNode.SerializedUniqueName:
+                case DeleteNode_ChangeInfo:
+                    // Relation nodes are configuration nodes. Creating or
+                    // deleting one can switch between node-based relations and
+                    // the legacy fallback, so the final composite must be
+                    // recalculated even though the node has no render output.
+                    AddWholeCanvasToMainImage();
+                    AddWholeCanvasToEveryImagePreview(false);
+                    AddAllNodesToImagePreviews();
+                    break;
+                case NodePosition_ChangeInfo info when tracker.Document.NodeGraph.TryLookupNode(info.NodeId)
+                    is OcclusionRelationNode:
+                    // The horizontal node position is the relation priority.
+                    AddWholeCanvasToMainImage();
+                    AddWholeCanvasToEveryImagePreview(false);
+                    AddAllNodesToImagePreviews();
+                    break;
+                case NodePosition_ChangeInfo info when tracker.Document.NodeGraph.TryLookupNode(info.NodeId)
+                    is LayerNode { HasLocalOcclusionConfiguration: true }:
+                    // A layer owning a local relation also uses its horizontal
+                    // node position as that relation's priority.
+                    AddWholeCanvasToMainImage();
+                    AddWholeCanvasToEveryImagePreview(false);
+                    AddAllNodesToImagePreviews();
+                    break;
                 case PropertyValueUpdated_ChangeInfo info:
                     AddWholeCanvasToMainImage();
                     AddWholeCanvasToEveryImagePreview(false);

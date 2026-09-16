@@ -7,4 +7,5 @@ public record NodePropertyInfo(
     bool IsInput,
     object? InputValue,
     Guid NodeId,
-    IReadOnlyList<(Guid NodeId, string PropertyName)> ConnectedProperties);
+    IReadOnlyList<(Guid NodeId, string PropertyName)> ConnectedProperties,
+    bool IsRenderDependency = true);
