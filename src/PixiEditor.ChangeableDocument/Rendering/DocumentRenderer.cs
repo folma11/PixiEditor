@@ -66,6 +66,7 @@ public class DocumentRenderer : IDisposable
 
         RenderContext context = new(renderTexture.DrawingSurface.Canvas, frame, resolution, Document.Size, Document.Size,
             Document.ProcessingColorSpace, SamplingOptions.Default, Document.NodeGraph);
+        context.Document = Document;
         context.FullRerender = true;
         IReadOnlyNodeGraph membersOnlyGraph = ConstructMembersOnlyGraph(layersToCombine, Document.NodeGraph);
         try
@@ -117,6 +118,7 @@ public class DocumentRenderer : IDisposable
 
         RenderContext context = new(renderTexture.DrawingSurface.Canvas, frameTime, resolution, Document.Size, Document.Size,
             Document.ProcessingColorSpace, SamplingOptions.Default, Document.NodeGraph);
+        context.Document = Document;
         context.FullRerender = true;
 
         node.RenderForOutput(context, toRenderOn.Canvas, null);
@@ -223,6 +225,7 @@ public class DocumentRenderer : IDisposable
             new(renderTexture.DrawingSurface.Canvas, frameTime, ChunkResolution.Full,
                 SolveRenderOutputSize(customOutput, graph, Document.Size),
                 Document.Size, Document.ProcessingColorSpace, SamplingOptions.Default, Document.NodeGraph) { FullRerender = true };
+        context.Document = Document;
 
         if (hasCustomOutput)
         {

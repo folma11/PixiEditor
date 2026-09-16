@@ -4,6 +4,7 @@ using Drawie.Backend.Core.Surfaces.ImageData;
 using Drawie.Numerics;
 using PixiEditor.ChangeableDocument.Changeables.Graph;
 using PixiEditor.ChangeableDocument.Changeables.Graph.Interfaces;
+using PixiEditor.ChangeableDocument.Changeables.Interfaces;
 using PixiEditor.ChangeableDocument.Rendering.ContextData;
 using BlendMode = PixiEditor.ChangeableDocument.Enums.BlendMode;
 using DrawingApiBlendMode = Drawie.Backend.Core.Surfaces.BlendMode;
@@ -23,6 +24,7 @@ public class RenderContext
 
     public VecI DocumentSize { get; set; }
     public Canvas? RenderSurface { get; set; }
+    public IReadOnlyDocument? Document { get; set; }
     public bool FullRerender { get; set; } = false;
     public PointerInfo PointerInfo { get; set; }
     public KeyboardInfo KeyboardInfo { get; set; }
@@ -101,6 +103,7 @@ public class RenderContext
     {
         return new RenderContext(RenderSurface, FrameTime, ChunkResolution, RenderOutputSize, DocumentSize, ProcessingColorSpace, DesiredSamplingOptions, Graph, Opacity)
         {
+            Document = Document,
             FullRerender = FullRerender,
             TargetOutput = TargetOutput,
             AffectedArea = AffectedArea,

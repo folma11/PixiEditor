@@ -361,6 +361,7 @@ internal class SceneRenderer : IDisposable
 
         RenderContext context = new(renderTarget.Canvas, DocumentViewModel.AnimationHandler.ActiveFrameTime,
             resolution, finalSize, Document.Size, Document.ProcessingColorSpace, samplingOptions, Document.NodeGraph);
+        context.Document = Document;
         context.PointerInfo = pointerInfo;
         context.KeyboardInfo = keyboardInfo;
         context.EditorData = editorData;

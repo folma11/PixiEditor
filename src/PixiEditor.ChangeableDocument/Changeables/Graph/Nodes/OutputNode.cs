@@ -1,5 +1,6 @@
 ﻿using PixiEditor.ChangeableDocument.Changeables.Graph.Interfaces;
 using PixiEditor.ChangeableDocument.Rendering;
+using Drawie.Backend.Core.Numerics;
 using Drawie.Numerics;
 
 namespace PixiEditor.ChangeableDocument.Changeables.Graph.Nodes;
@@ -55,6 +56,14 @@ public class OutputNode : Node, IRenderInput
 
             adjusted.RenderSurface = preview.Texture.DrawingSurface.Canvas;
             Input.Value?.Paint(adjusted, adjusted.RenderSurface);
+
+            if (context.Document is not null && context.TargetOutput is null)
+            {
+                Matrix3X3 previewMatrix = preview.Texture.DrawingSurface.Canvas.TotalMatrix;
+                OcclusionGraphRenderer.Apply(preview.Texture, context.Document, previewMatrix,
+                    preview.Texture.Size, adjusted.FrameTime, adjusted);
+            }
+
             preview.Texture.DrawingSurface.Canvas.RestoreToCount(saved);
         }
     }
