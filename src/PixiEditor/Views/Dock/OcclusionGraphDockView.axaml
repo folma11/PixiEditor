@@ -1,0 +1,126 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:dock="clr-namespace:PixiEditor.ViewModels.Dock"
+             mc:Ignorable="d"
+             d:DesignWidth="320" d:DesignHeight="500"
+             x:DataType="dock:OcclusionGraphDockViewModel"
+             x:Class="PixiEditor.Views.Dock.OcclusionGraphDockView">
+    <Grid RowDefinitions="Auto,Auto,*,Auto,Auto,Auto,*,Auto" Margin="8" RowSpacing="8">
+        <DockPanel Grid.Row="0">
+            <CheckBox DockPanel.Dock="Right"
+                      Content="有効"
+                      IsChecked="{Binding IsEnabled, Mode=TwoWay}" />
+            <TextBlock Text="局所前後関係" FontWeight="SemiBold" />
+        </DockPanel>
+
+        <TextBlock Grid.Row="1"
+                   Text="Front が Back と重なる部分だけ、通常のレイヤー順を補正します。"
+                   TextWrapping="Wrap"
+                   Opacity="0.75" />
+
+        <ScrollViewer Grid.Row="2"
+                      HorizontalScrollBarVisibility="Auto"
+                      VerticalScrollBarVisibility="Auto"
+                      MinHeight="155">
+            <Border Background="{DynamicResource ThemeBackgroundBrush1}" Padding="4">
+                <Canvas x:Name="GraphCanvas" Width="620" Height="220">
+                    <Canvas.RenderTransform>
+                        <ScaleTransform ScaleX="{Binding GraphZoom}"
+                                        ScaleY="{Binding GraphZoom}" />
+                    </Canvas.RenderTransform>
+                    <ItemsControl Width="620" Height="220"
+                                  ItemsSource="{Binding GraphNodes}">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <Canvas />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemContainerTheme>
+                            <ControlTheme TargetType="ContentPresenter">
+                                <Setter Property="Canvas.Left" Value="{ReflectionBinding X}" />
+                                <Setter Property="Canvas.Top" Value="{ReflectionBinding Y}" />
+                            </ControlTheme>
+                        </ItemsControl.ItemContainerTheme>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="dock:OcclusionGraphNodeViewModel">
+                                <Border Width="170" Height="46"
+                                        Padding="7"
+                                        CornerRadius="4"
+                                        BorderThickness="1"
+                                        BorderBrush="{DynamicResource ThemeBorderMidBrush}"
+                                        Background="{DynamicResource ThemeBackgroundBrush}"
+                                        PointerPressed="GraphNodePointerPressed"
+                                        PointerMoved="GraphNodePointerMoved"
+                                        PointerReleased="GraphNodePointerReleased">
+                                    <StackPanel Orientation="Horizontal" Spacing="5">
+                                        <TextBlock Text="⚠"
+                                                   IsVisible="{Binding IsConflict}"
+                                                   Foreground="Orange" />
+                                        <TextBlock Text="{Binding DisplayName}"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   VerticalAlignment="Center" />
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </Canvas>
+            </Border>
+        </ScrollViewer>
+
+        <Grid Grid.Row="3" ColumnDefinitions="Auto,Auto,Auto,*,Auto" ColumnSpacing="5">
+            <Button Grid.Column="0" Content="−" Command="{Binding ZoomOutCommand}" />
+            <TextBlock Grid.Column="1" Text="{Binding GraphZoomText}" VerticalAlignment="Center" />
+            <Button Grid.Column="2" Content="＋" Command="{Binding ZoomInCommand}" />
+            <TextBlock Grid.Column="3"
+                       Text="ノードをドラッグ／スクロールバーで移動"
+                       VerticalAlignment="Center"
+                       Opacity="0.65" />
+            <Button Grid.Column="4" Content="中央へ" Command="{Binding ResetGraphViewCommand}" />
+        </Grid>
+
+        <Grid Grid.Row="4" ColumnDefinitions="*,*,Auto" ColumnSpacing="5">
+            <ComboBox Grid.Column="0"
+                      ItemsSource="{Binding Layers}"
+                      SelectedItem="{Binding FrontLayer, Mode=TwoWay}"
+                      DisplayMemberBinding="{Binding DisplayName}" />
+            <ComboBox Grid.Column="1"
+                      ItemsSource="{Binding Layers}"
+                      SelectedItem="{Binding BackLayer, Mode=TwoWay}"
+                      DisplayMemberBinding="{Binding DisplayName}" />
+            <Button Grid.Column="2" Content="追加" Command="{Binding AddRelationCommand}" />
+        </Grid>
+
+        <TextBlock Grid.Row="5" Text="関係一覧" FontWeight="SemiBold" />
+
+        <ListBox Grid.Row="6"
+                 ItemsSource="{Binding Relations}"
+                 SelectedItem="{Binding SelectedRelation, Mode=TwoWay}">
+            <ListBox.ItemTemplate>
+                <DataTemplate x:DataType="dock:OcclusionRelationViewModel">
+                    <StackPanel Orientation="Horizontal" Spacing="4" Margin="4">
+                        <TextBlock Text="⚠"
+                                   IsVisible="{Binding IsIgnored}"
+                                   Foreground="OrangeRed" />
+                        <TextBlock Text="{Binding DisplayText}" />
+                        <TextBlock Text="（コンフリクトで無視）"
+                                   IsVisible="{Binding IsIgnored}"
+                                   Foreground="OrangeRed" />
+                    </StackPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <StackPanel Grid.Row="7" Spacing="5">
+            <StackPanel Orientation="Horizontal" Spacing="5">
+                <Button Content="反転" Command="{Binding ReverseRelationCommand}" />
+                <Button Content="削除" Command="{Binding RemoveRelationCommand}" />
+                <Button Content="更新" Command="{Binding RefreshCommand}" />
+            </StackPanel>
+            <TextBlock Text="{Binding StatusText}" TextWrapping="Wrap" />
+            <TextBlock Text="{Binding ConflictText}" TextWrapping="Wrap" Opacity="0.75" />
+        </StackPanel>
+    </Grid>
+</UserControl>

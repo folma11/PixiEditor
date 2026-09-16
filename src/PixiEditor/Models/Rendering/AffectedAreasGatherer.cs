@@ -17,6 +17,7 @@ using PixiEditor.ChangeableDocument.ChangeInfos.Vectors;
 using PixiEditor.Models.DocumentPassthroughActions;
 using Drawie.Numerics;
 using PixiEditor.ChangeableDocument.ChangeInfos.NodeGraph.Blackboard;
+using PixiEditor.ChangeableDocument.ChangeInfos.Occlusion;
 
 namespace PixiEditor.Models.Rendering;
 #nullable enable
@@ -218,6 +219,11 @@ internal class AffectedAreasGatherer
                 case FallbackAnimationToLayerImage_ChangeInfo:
                     AddWholeCanvasToMainImage();
                     AddWholeCanvasToEveryImagePreview(true);
+                    AddAllNodesToImagePreviews();
+                    break;
+                case OcclusionRelation_ChangeInfo or OcclusionGraphEnabled_ChangeInfo:
+                    AddWholeCanvasToMainImage();
+                    AddWholeCanvasToEveryImagePreview(false);
                     AddAllNodesToImagePreviews();
                     break;
             }

@@ -76,6 +76,8 @@ internal class LayoutManager
         PaletteViewerDockViewModel paletteViewerDockViewModel =
             new(mainViewModel.ColorsSubViewModel, mainViewModel.DocumentManagerSubViewModel);
         TimelineDockViewModel timelineDockViewModel = new(mainViewModel.DocumentManagerSubViewModel);
+        OcclusionGraphDockViewModel occlusionGraphDockViewModel =
+            new(mainViewModel.DocumentManagerSubViewModel);
 
         NodeGraphDockViewModel nodeGraphDockViewModel = new(mainViewModel.DocumentManagerSubViewModel);
         /*
@@ -96,6 +98,7 @@ internal class LayoutManager
         RegisterDockable(swatchesDockViewModel);
         RegisterDockable(paletteViewerDockViewModel);
         RegisterDockable(timelineDockViewModel);
+        RegisterDockable(occlusionGraphDockViewModel);
         RegisterDockable(nodeGraphDockViewModel);
         /*
         RegisterDockable(channelsDockDockViewModel);
@@ -138,7 +141,11 @@ internal class LayoutManager
                         SplitDirection = DockingDirection.Bottom,
                         Second = new DockableArea
                         {
-                            Id = "LayersArea", Dockables = [DockContext.CreateDockable(layersDockViewModel)]
+                            Id = "LayersArea", Dockables =
+                            [
+                                DockContext.CreateDockable(layersDockViewModel),
+                                DockContext.CreateDockable(occlusionGraphDockViewModel)
+                            ]
                         },
                     },
                     FirstSize = 0.66,

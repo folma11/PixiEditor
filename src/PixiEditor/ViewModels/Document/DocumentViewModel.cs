@@ -194,6 +194,7 @@ internal partial class DocumentViewModel : PixiObservableObject, IDocument
     public DocumentToolsModule Tools { get; private set; }
     public DocumentOperationsModule Operations { get; private set; }
     public DocumentRenderer Renderer { get; private set; }
+    public OcclusionGraph OcclusionGraph => Internals.Tracker.Document.OcclusionGraph;
     public SceneRenderer SceneRenderer { get; private set; }
     public DocumentEventsModule EventInlet { get; private set; }
 

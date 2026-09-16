@@ -15,4 +15,7 @@ internal interface IDocumentOperations
     public Guid? CreateStructureMember(Type type, ActionSource source, string? name = null);
     public void InvokeCustomAction(Action action, bool stopActiveExecutor = true);
     public ChangeBlock StartChangeBlock();
+    public void SetOcclusionRelation(Guid frontLayerId, Guid backLayerId, bool enabled);
+    public void ReverseOcclusionRelation(Guid frontLayerId, Guid backLayerId);
+    public void SetOcclusionGraphEnabled(bool enabled);
 }

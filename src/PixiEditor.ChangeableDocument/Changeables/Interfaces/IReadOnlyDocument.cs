@@ -16,6 +16,11 @@ public interface IReadOnlyDocument : IDisposable, ICloneable
     IReadOnlyNodeGraph NodeGraph { get; }
 
     /// <summary>
+    /// Experimental local front/back layer relationships.
+    /// </summary>
+    OcclusionGraph OcclusionGraph { get; }
+
+    /// <summary>
     /// The selection of the document
     /// </summary>
     IReadOnlySelection Selection { get; }

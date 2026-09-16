@@ -12,6 +12,7 @@ using PixiEditor.Models.Tools;
 using Drawie.Numerics;
 using PixiEditor.ChangeableDocument.Changeables.Graph.Interfaces;
 using PixiEditor.ChangeableDocument.Changeables.Interfaces;
+using PixiEditor.ChangeableDocument.Changeables;
 using PixiEditor.Models.DocumentPassthroughActions;
 using PixiEditor.ViewModels.Document;
 
@@ -43,6 +44,7 @@ internal interface IDocument : IHandler, Extensions.CommonApi.Documents.IDocumen
     public double VerticalSymmetryAxisXBindable { get; }
     public IDocumentOperations Operations { get; }
     public DocumentRenderer Renderer { get; }
+    public OcclusionGraph OcclusionGraph { get; }
     public ISnappingHandler SnappingHandler { get; }
     public IReadOnlyCollection<Guid> SelectedMembers { get; }
     public Dictionary<Guid, Texture> SceneTextures { get; }

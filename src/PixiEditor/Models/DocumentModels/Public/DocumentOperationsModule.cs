@@ -161,6 +161,37 @@ internal class DocumentOperationsModule : IDocumentOperations
             new EndStructureMemberOpacity_Action());
     }
 
+    public void SetOcclusionRelation(Guid frontLayerId, Guid backLayerId, bool enabled)
+    {
+        if (Internals.ChangeController.IsBlockingChangeActive)
+            return;
+
+        Internals.ChangeController.TryStopActiveExecutor();
+        Internals.ActionAccumulator.AddFinishedActions(
+            new SetOcclusionRelation_Action(enabled, frontLayerId, backLayerId));
+    }
+
+    public void ReverseOcclusionRelation(Guid frontLayerId, Guid backLayerId)
+    {
+        if (Internals.ChangeController.IsBlockingChangeActive || frontLayerId == backLayerId)
+            return;
+
+        Internals.ChangeController.TryStopActiveExecutor();
+        using ChangeBlock block = StartChangeBlock();
+        Internals.ActionAccumulator.AddActions(
+            new SetOcclusionRelation_Action(false, frontLayerId, backLayerId),
+            new SetOcclusionRelation_Action(true, backLayerId, frontLayerId));
+    }
+
+    public void SetOcclusionGraphEnabled(bool enabled)
+    {
+        if (Internals.ChangeController.IsBlockingChangeActive)
+            return;
+
+        Internals.ChangeController.TryStopActiveExecutor();
+        Internals.ActionAccumulator.AddFinishedActions(new SetOcclusionGraphEnabled_Action(enabled));
+    }
+
     /// <summary>
     /// Adds a new viewport or updates a existing one
     /// </summary>

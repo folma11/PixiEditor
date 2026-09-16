@@ -388,6 +388,13 @@ internal class SceneRenderer : IDisposable
             finalGraph.Execute(context);
         }
 
+        if (!debugRecord && targetOutput is null && renderTexture is not null)
+        {
+            Matrix3X3 renderMatrix = renderTarget.Canvas.TotalMatrix;
+            OcclusionGraphRenderer.Apply(renderTexture, Document, renderMatrix, renderTexture.Size,
+                context.FrameTime, context);
+        }
+
         ExecuteBrushOutputPreviews(finalGraph, previewTextures, context);
 
         if (renderOnionSkinning)

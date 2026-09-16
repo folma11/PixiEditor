@@ -477,6 +477,7 @@ internal class DocumentUpdater
 
     private void ProcessDeleteStructureMember(DeleteStructureMember_ChangeInfo info)
     {
+        doc.OcclusionGraph.RemoveRelationsForLayer(info.Id);
         IStructureMemberHandler memberVM = doc.StructureHelper.Find(info.Id);
         if (doc.SelectedStructureMember == memberVM)
         {

@@ -33,6 +33,7 @@ internal class Document : IChangeable, IReadOnlyDocument
 
     IReadOnlyReferenceLayer? IReadOnlyDocument.ReferenceLayer => ReferenceLayer;
     public DocumentRenderer Renderer { get; }
+    public OcclusionGraph OcclusionGraph { get; private set; } = new();
     public IReadOnlyBlackboard Blackboard => NodeGraph.Blackboard;
     public ColorSpace ProcessingColorSpace { get; internal set; } = ColorSpace.CreateSrgbLinear();
 
@@ -192,6 +193,7 @@ internal class Document : IChangeable, IReadOnlyDocument
             VerticalSymmetryAxisX = VerticalSymmetryAxisX,
             ReferenceLayer = ReferenceLayer?.Clone(),
             NodeGraph = NodeGraph?.Clone() as NodeGraph,
+            OcclusionGraph = OcclusionGraph.Clone(),
             AnimationData = AnimationData?.Clone() as AnimationData,
             Selection = Selection != null ? new Selection() { SelectionPath = Selection.SelectionPath != null ? new VectorPath(Selection.SelectionPath) : null } : null
         };

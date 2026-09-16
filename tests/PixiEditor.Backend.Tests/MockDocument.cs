@@ -1,5 +1,6 @@
 ﻿using Drawie.Backend.Core.Surfaces.ImageData;
 using Drawie.Numerics;
+using PixiEditor.ChangeableDocument.Changeables;
 using PixiEditor.ChangeableDocument.Changeables.Graph;
 using PixiEditor.ChangeableDocument.Changeables.Graph.Interfaces;
 using PixiEditor.ChangeableDocument.Changeables.Interfaces;
@@ -16,6 +17,7 @@ public class MockDocument : IReadOnlyDocument
 
     public Guid DocumentId { get; }
     public IReadOnlyNodeGraph NodeGraph { get; }
+    public OcclusionGraph OcclusionGraph { get; } = new();
     public IReadOnlySelection Selection { get; }
     public IReadOnlyAnimationData AnimationData { get; }
     public VecI Size { get; } = new VecI(16, 16);

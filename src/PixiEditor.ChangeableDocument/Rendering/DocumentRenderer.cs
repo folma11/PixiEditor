@@ -1,5 +1,6 @@
 ﻿using PixiEditor.ChangeableDocument.Changeables.Animations;
 using PixiEditor.ChangeableDocument.Changeables.Graph;
+using PixiEditor.ChangeableDocument.Changeables;
 using PixiEditor.ChangeableDocument.Changeables.Graph.Interfaces;
 using PixiEditor.ChangeableDocument.Changeables.Graph.Nodes;
 using PixiEditor.ChangeableDocument.Changeables.Interfaces;
@@ -207,6 +208,7 @@ public class DocumentRenderer : IDisposable
         renderTexture.DrawingSurface.Canvas.Clear();
 
         renderTexture.DrawingSurface.Canvas.SetMatrix(toRenderOn.Canvas.TotalMatrix);
+        Matrix3X3 renderMatrix = renderTexture.DrawingSurface.Canvas.TotalMatrix;
         toRenderOn.Canvas.Save();
         toRenderOn.Canvas.SetMatrix(Matrix3X3.Identity);
 
@@ -230,6 +232,14 @@ public class DocumentRenderer : IDisposable
         try
         {
             graph.Execute(context);
+
+            // Apply the experimental graph after the normal graph so the
+            // existing node graph and its serialization semantics stay intact.
+            if (!hasCustomOutput)
+            {
+                OcclusionGraphRenderer.Apply(renderTexture, Document, renderMatrix, renderSize, frameTime, context);
+            }
+
             toRenderOn.Canvas.DrawSurface(renderTexture.DrawingSurface, 0, 0);
         }
         catch (Exception e)
