@@ -114,6 +114,7 @@ internal static class ServiceCollectionHelpers
             .AddTool<ZoomToolViewModel>()
             // File types
             .AddSingleton<IoFileType, PixiFileType>()
+            .AddSingleton<IoFileType, PsdFileType>()
             .AddSingleton<IoFileType, PngFileType>()
             .AddSingleton<IoFileType, JpegFileType>()
             .AddSingleton<IoFileType, BmpFileType>()

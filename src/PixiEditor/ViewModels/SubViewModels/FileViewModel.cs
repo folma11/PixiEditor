@@ -360,6 +360,11 @@ internal class FileViewModel : SubViewModel<ViewModelMain>
 
         try
         {
+            if (path.EndsWith(".psd", StringComparison.OrdinalIgnoreCase))
+            {
+                return OpenPsd(path, associatePath);
+            }
+
             if (path.EndsWith(".pixi"))
             {
                 return OpenDotPixi(path, associatePath);
@@ -404,6 +409,11 @@ internal class FileViewModel : SubViewModel<ViewModelMain>
     {
         try
         {
+            if (path.EndsWith(".psd", StringComparison.OrdinalIgnoreCase))
+            {
+                return Importer.ImportPsdDocument(path, associatePath);
+            }
+
             if (path.EndsWith(".pixi"))
             {
                 return Importer.ImportDocument(path, associatePath);
@@ -521,6 +531,19 @@ internal class FileViewModel : SubViewModel<ViewModelMain>
 
         var fileSize = new FileInfo(path).Length;
         Analytics.SendOpenFile(PixiFileType.PixiFile, fileSize, document.SizeBindable);
+
+        return document;
+    }
+
+    private DocumentViewModel OpenPsd(string path, bool associatePath = true)
+    {
+        DocumentViewModel document = Importer.ImportPsdDocument(path, associatePath);
+
+        AddDocumentViewModelToTheSystem(document);
+        AddRecentlyOpened(document.FullFilePath);
+
+        var fileSize = new FileInfo(path).Length;
+        Analytics.SendOpenFile(PsdFileType.PsdFile, fileSize, document.SizeBindable);
 
         return document;
     }

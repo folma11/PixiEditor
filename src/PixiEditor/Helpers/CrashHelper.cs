@@ -12,7 +12,7 @@ namespace PixiEditor.Helpers;
 
 internal partial class CrashHelper
 {
-    private readonly IHardwareInfo hwInfo;
+    private readonly IHardwareInfo? hwInfo;
 
     public static void SaveCrashInfo(Exception exception, IEnumerable<DocumentViewModel> documents)
     {
@@ -32,12 +32,27 @@ internal partial class CrashHelper
 
     public CrashHelper()
     {
-        hwInfo = new HardwareInfo();
+        try
+        {
+            hwInfo = new HardwareInfo();
+        }
+        catch
+        {
+            // Hardware.Info may query WMI during construction. Crash reporting
+            // must still be able to continue when WMI access is unavailable.
+            hwInfo = null;
+        }
     }
 
     public void GetCPUInformation(StringBuilder builder, ApiCrashReport report)
     {
         builder.AppendLine("CPU:");
+        if (hwInfo is null)
+        {
+            builder.AppendLine("  Unavailable: hardware information could not be initialized.");
+            return;
+        }
+
         hwInfo.RefreshCPUList(false);
 
         report.SystemInformation["CPUs"] = hwInfo.CpuList.Select(x => new
@@ -60,6 +75,12 @@ internal partial class CrashHelper
     public void GetGPUInformation(StringBuilder builder, ApiCrashReport report)
     {
         builder.AppendLine("GPU:");
+        if (hwInfo is null)
+        {
+            builder.AppendLine("  Unavailable: hardware information could not be initialized.");
+            return;
+        }
+
         hwInfo.RefreshVideoControllerList();
 
         report.SystemInformation["GPUs"] = hwInfo.VideoControllerList.Select(x => new
@@ -80,6 +101,12 @@ internal partial class CrashHelper
     public void GetMemoryInformation(StringBuilder builder, ApiCrashReport report)
     {
         builder.AppendLine("Memory:");
+        if (hwInfo is null)
+        {
+            builder.AppendLine("  Unavailable: hardware information could not be initialized.");
+            return;
+        }
+
         hwInfo.RefreshMemoryStatus();
 
         var memInfo = hwInfo.MemoryStatus;
@@ -149,6 +176,11 @@ internal partial class CrashHelper
         // TODO: Proper DebugBuild checking
         /*if (DebugViewModel.IsDebugBuild)
             return;*/
+
+        if (string.IsNullOrWhiteSpace(AnalyticsClient.GetAnalyticsUrl()))
+        {
+            return;
+        }
 
         var report = CrashReport.Generate(e, new NonCrashInfo(filePath, memberName));
         

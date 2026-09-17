@@ -142,6 +142,22 @@ internal class Importer : ObservableObject
         }
     }
 
+    public static DocumentViewModel ImportPsdDocument(string path, bool associatePath = true)
+    {
+        try
+        {
+            return PsdDocumentConverter.Import(path, associatePath);
+        }
+        catch (PsdUnsupportedException e)
+        {
+            throw new InvalidFileTypeException(new LocalizedString("PSD_UNSUPPORTED"), e);
+        }
+        catch (PsdCorruptedException e)
+        {
+            throw new CorruptedFileException(new LocalizedString("PSD_CORRUPTED"), e);
+        }
+    }
+
     public static Surface GetPreviewSurface(string path)
     {
         var fileExtension = Path.GetExtension(path).ToLower();
@@ -151,6 +167,9 @@ internal class Importer : ObservableObject
             throw new InvalidFileTypeException(new LocalizedString("FILE_EXTENSION_NOT_SUPPORTED",
                 fileExtension));
         }
+
+        if (fileExtension == ".psd")
+            return PsdDocumentConverter.LoadPreview(path);
 
         if (fileExtension != ".pixi")
             return Surface.Load(path);

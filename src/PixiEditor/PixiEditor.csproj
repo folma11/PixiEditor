@@ -109,6 +109,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\PixiEditor.Psd\PixiEditor.Psd.csproj"/>
     <ProjectReference Include="..\ColorPicker\src\ColorPicker.AvaloniaUI\ColorPicker.AvaloniaUI.csproj"/>
     <ProjectReference Include="..\Drawie\src\Drawie.Interop.Avalonia\Drawie.Interop.Avalonia.csproj"/>
     <ProjectReference Include="..\Drawie\src\Drawie.Interop.Avalonia.Core\Drawie.Interop.Avalonia.Core.csproj"/>

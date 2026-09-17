@@ -2,9 +2,11 @@
 using Avalonia.Threading;
 using Drawie.Backend.Core;
 using Drawie.Backend.Core.Surfaces;
+using Drawie.Backend.Core.Surfaces.ImageData;
 using PixiEditor.Extensions.Exceptions;
 using PixiEditor.Helpers;
 using PixiEditor.Models;
+using PixiEditor.Models.IO;
 using Drawie.Numerics;
 using PixiEditor.Parser;
 
@@ -53,38 +55,54 @@ internal class PixiFilePreviewImage : TextureControl
 
     private async Task LoadImage(string path)
     {
-        string fileExtension = Path.GetExtension(path);
+        try
+        {
+            string fileExtension = Path.GetExtension(path);
 
-        byte[] imageBytes;
+            byte[] imageBytes;
+            VecI? rawImageSize = null;
 
-        bool isPixi = fileExtension == ".pixi";
-        if (isPixi)
-        {
-            await using FileStream fileStream = File.OpenRead(path);
-            imageBytes = await PixiParser.ReadPreviewAsync(fileStream);
-        }
-        else if (SupportedFilesHelper.IsExtensionSupported(fileExtension) &&
-                 SupportedFilesHelper.IsRasterFormat(fileExtension))
-        {
-            imageBytes = await File.ReadAllBytesAsync(path);
-        }
-        else
-        {
-            return;
-        }
-
-        Dispatcher.UIThread.Post(() =>
-        {
-            try
+            bool isPixi = fileExtension == ".pixi";
+            if (isPixi)
             {
-                var surface = LoadTexture(imageBytes);
-                SetImage(surface);
+                await using FileStream fileStream = File.OpenRead(path);
+                imageBytes = await PixiParser.ReadPreviewAsync(fileStream);
             }
-            catch (Exception e)
+            else if (fileExtension.Equals(".psd", StringComparison.OrdinalIgnoreCase))
             {
-                SetCorrupt();
+                using Surface preview = Importer.GetPreviewSurface(path);
+                imageBytes = preview.ToByteArray(ColorType.Rgba8888, AlphaType.Unpremul);
+                rawImageSize = preview.Size;
             }
-        });
+            else if (SupportedFilesHelper.IsExtensionSupported(fileExtension) &&
+                     SupportedFilesHelper.IsRasterFormat(fileExtension))
+            {
+                imageBytes = await File.ReadAllBytesAsync(path);
+            }
+            else
+            {
+                return;
+            }
+
+            Dispatcher.UIThread.Post(() =>
+            {
+                try
+                {
+                    var surface = rawImageSize is VecI size
+                        ? Texture.Load(imageBytes, ColorType.Rgba8888, size)
+                        : LoadTexture(imageBytes);
+                    SetImage(surface);
+                }
+                catch (Exception)
+                {
+                    SetCorrupt();
+                }
+            });
+        }
+        catch (Exception)
+        {
+            SetCorrupt();
+        }
     }
 
     private void SetImage(Texture? texture)
